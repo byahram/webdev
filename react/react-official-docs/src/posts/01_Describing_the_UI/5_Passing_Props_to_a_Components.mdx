@@ -1,0 +1,176 @@
+---
+title: "05. 컴포넌트에 Props 전달하기"
+---
+
+# 컴포넌트에 Props 전달하기
+
+## ◾️ Props란?
+
+- **props (properties)**는 **부모 컴포넌트**가 **자식 컴포넌트에게 데이터를 전달**하는 방법
+- 모든 JavaScript 값(문자열, 숫자, 객체, 배열, 함수 등)을 전달할 수 있다.
+- 컴포넌트의 **재사용성**과 **유지보수성**을 높여준다.
+
+```text
+type WelcomeProps = {
+  name: string;
+};
+
+function Welcome({ name }: WelcomeProps) {
+  return <h1>Hello, {name}</h1>;
+}
+```
+
+### 1. 컴포넌트에 props 전달하기
+
+- Avatar에 person (객체)와 size (숫자)를 전달
+
+```text
+type Person = {
+  name: string;
+  imageId: string;
+};
+
+export default function Profile() {
+  return (
+    <div>
+      <Avatar
+        size={100}
+        person={{
+          name: 'Katsuko Saruhashi',
+          imageId: 'YfeOqp2',
+        }}
+      />
+      <Avatar
+        size={50}
+        person={{
+          name: 'Lin Lanying',
+          imageId: '1bX5QH6',
+        }}
+      />
+    </div>
+  );
+}
+```
+
+### 2. 자식 컴포넌트 내부에서 props 읽기
+
+```text
+type AvatarProps = {
+  person: Person;
+  size: number;
+};
+
+// optional
+type AvatarProps = {
+  person: Person;
+  size?: number;
+};
+
+function getImageUrl(person: Person, size: 's' | 'm' | 'l' = 's'): string {
+  return `https://i.imgur.com/${person.imageId}${size}.jpg`;
+}
+
+function Avatar({ person, size }: AvatarProps) {
+  return (
+    <img
+      className="avatar"
+      src={getImageUrl(person)}
+      alt={person.name}
+      width={size}
+      height={size}
+    />
+  );
+}
+```
+
+## ◾️ prop의 기본값 지정하기
+
+props가 전달되지 않았을 경우를 대비해 **기본값(default value)**을 설정할 수 있다.
+
+```text
+type AvatarProps = {
+  person: Person;
+  size: number;
+};
+
+function Avatar({ person, size = 100 }: AvatarProps) {
+  return (
+    <img
+      className="avatar"
+      src={getImageUrl(person)}
+      alt={person.name}
+      width={size}
+      height={size}
+    />
+  );
+}
+```
+
+## ◾️ JSX spread 문법으로 props 전달하기
+
+props를 객체 전체로 전달하고 싶다면 JSX의 spread 문법(...)을 사용할 수 있다.
+
+```text
+type AvatarProps = {
+  person: Person;
+  size: number;
+};
+
+function Profile(props) {
+  return (
+    <div className="card">
+      <Avatar {...props} />
+    </div>
+  );
+}
+```
+
+## ◾️ 자식을 JSX로 전달하기
+
+컴포넌트에 JSX를 자식 요소로 전달할 수도 있다.
+
+```tsx
+function Card({ children }: { children: React.ReactNode }) {
+  return <div className="card">{children}</div>;
+}
+
+export default function Profile() {
+  return (
+    <Card>
+      <Avatar
+        size={80}
+        person={{
+          name: "Aklilu Lemma",
+          imageId: "OKS67lh",
+        }}
+      />
+    </Card>
+  );
+}
+```
+
+## ◾️ 시간에 따라 props가 변하는 방식
+
+props는 부모 컴포넌트의 상태(state)나 변수에 따라 시간에 따라 변경될 수 있다.
+
+```tsx
+function Clock({ time }: { time: Date }) {
+  return <h1>{time.toLocaleTimeString()}</h1>;
+}
+
+export default function App() {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return <Clock time={now} />;
+}
+```
+
+## ◾️ 참고
+
+- 참고: [React 공식 문서](https://ko.react.dev/learn/passing-props-to-a-component)
+- 챌린지: [챌린지](https://ko.react.dev/learn/passing-props-to-a-component#challenges)
